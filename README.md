@@ -21,7 +21,7 @@ Ce dépôt contient `BypassQuest.js`, un script à injecter dans la console du c
 
 1. Ouvrez Discord (de préférence l'application Desktop si la quête nécessite l'accès natif).
 2. Ouvrez les outils développeur (Ctrl+Shift+I) et sélectionnez l'onglet Console.
-3. Collez le contenu de `BypassQuest.js` et appuyez sur Entrée.
+3. Collez le contenu de [BypassQuest.js](https://raw.githubusercontent.com/2forgetitouan/Bypass-Quests-For-Discord/refs/heads/main/BypassQuest.js) et appuyez sur Entrée.
 4. Le script démarre automatiquement (`main()` est appelé). Les messages s'affichent en FR ou EN selon `CONFIG.language`.
 
 ### Commandes utiles
