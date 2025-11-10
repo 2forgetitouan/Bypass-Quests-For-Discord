@@ -2,7 +2,7 @@
 // CONFIGURATION INITIALE
 // =============================================
 const CONFIG = {
-    language: "EN", // "FR" ou "EN"
+    language: "FR", // "FR" ou "EN"
     debug: true, // Affiche les logs détaillés
 };
 
@@ -24,8 +24,13 @@ const TRANSLATIONS = {
         controller_stopping_by: (caller) => `Arrêt de QuestBot... appelé par : ${caller}`,
         controller_stopping_unknown: `Arrêt de QuestBot... (appel inconnu)`,
         controller_stopped: `QuestBot arrêté et déchargé.`,
-    controller_started: `QuestBot démarré. Relance en cours...`,
-    controller_start_no_main: `main() non disponible pour redémarrer ; veuillez recharger le script.`,
+        controller_started: `QuestBot démarré. Relance en cours...`,
+        controller_start_no_main: `main() non disponible pour redémarrer ; veuillez recharger le script.`,
+        controller_stop_check_failed: (e) => `La vérification d'arrêt a échoué : ${e}`,
+        controller_cleanup_error: (e) => `Erreur pendant le nettoyage : ${e}`,
+        controller_start_main_error: (e) => `Erreur lors du lancement de main() : ${e}`,
+        controller_status_error: (e) => `Statut : erreur ${e}`,
+        main_unhandled_rejection: (e) => `Erreur inattendue dans main() : ${e}`,
         controller_status_prefix: `Statut`,
         main_quest_info: (taskName, needed, done) => `Type de quête: ${taskName}, Secondes nécessaires: ${needed}, Secondes déjà faites: ${done}`,
         main_unhandled_type: (taskName) => `Type de quête non géré : ${taskName}`,
@@ -55,8 +60,13 @@ const TRANSLATIONS = {
         controller_stopping_by: (caller) => `QuestBot stopping... called by: ${caller}`,
         controller_stopping_unknown: `QuestBot stopping... (caller unknown)`,
         controller_stopped: `QuestBot stopped and unloaded.`,
-    controller_started: `QuestBot started. Relaunching...`,
-    controller_start_no_main: `main() not available to restart; please reload the script.`,
+        controller_started: `QuestBot started. Relaunching...`,
+        controller_start_no_main: `main() not available to restart; please reload the script.`,
+        controller_stop_check_failed: (e) => `Stop confirmation check failed: ${e}`,
+        controller_cleanup_error: (e) => `Error during cleanup: ${e}`,
+        controller_start_main_error: (e) => `Error while launching main(): ${e}`,
+        controller_status_error: (e) => `Status: error ${e}`,
+        main_unhandled_rejection: (e) => `Unexpected error in main(): ${e}`,
         controller_status_prefix: `Status`,
         main_quest_info: (taskName, needed, done) => `Quest type: ${taskName}, Seconds needed: ${needed}, Seconds done: ${done}`,
         main_unhandled_type: (taskName) => `Unhandled quest type: ${taskName}`,
@@ -124,14 +134,6 @@ function log(message, level = 'info') {
     }
 }
 
-// =============================================
-// FONCTIONS UTILITAIRES
-// =============================================
-function log(message) {
-    if (CONFIG.debug) console.log(`[QuestBot] ${message}`);
-}
-
-
 // Controller to allow stopping the script and cleaning up modifications
 if (!window.QuestBotController) {
     window.QuestBotController = {
@@ -167,7 +169,7 @@ if (!window.QuestBotController) {
                     log(t('controller_stopping_unknown'), 'info');
                 }
             } catch (e) {
-                log(`stop() confirmation check failed: ${e}`);
+                log(t('controller_stop_check_failed', e), 'error');
                 return;
             }
             // run cleanup functions (restore stores, unsubscribe handlers)
@@ -176,7 +178,7 @@ if (!window.QuestBotController) {
                     const fn = this.cleanups.pop();
                     if (typeof fn === 'function') fn();
                 } catch (e) {
-                    log(`Error during cleanup: ${e}`);
+                    log(t('controller_cleanup_error', e), 'error');
                 }
             }
             this.running = false;
@@ -200,7 +202,11 @@ if (!window.QuestBotController) {
             try { this.runId = (this.runId || 0) + 1; window.QuestBotRunId = this.runId; } catch (e) {}
             if (typeof main === 'function') {
                 // call main but don't await here
-                try { main().catch(log); } catch (e) { log('Error starting main(): '+e); }
+                try {
+                    main().catch((err) => log(t('main_unhandled_rejection', err), 'error'));
+                } catch (e) {
+                    log(t('controller_start_main_error', e), 'error');
+                }
             } else {
                     log(t('controller_start_no_main'), 'warn');
             }
@@ -223,7 +229,7 @@ window.statusQB = () => {
         log(t('controller_status_prefix') + ': ' + JSON.stringify(s), 'info');
         return s;
     } catch (e) {
-        log(t('controller_status_prefix') + ': error ' + e, 'error');
+        log(t('controller_status_error', e), 'error');
         return null;
     }
 };
@@ -298,7 +304,7 @@ async function main() {
     );
     
     if (!quest) {
-        log(TRANSLATIONS[CONFIG.language].questNotFound);
+        log(t('questNotFound'), 'warn');
         return;
     }
     
@@ -347,11 +353,11 @@ async function spoofVideo(quest, secondsDone, secondsNeeded) {
         // stop if runId changed or controller stopped
         try {
             if ((window.QuestBotRunId || 0) !== window.QuestBotController.runId || !window.QuestBotController.running) {
-                log('Stopped during WATCH_VIDEO loop.');
+                log(t('stopped_watch_video'), 'warn');
                 return;
             }
         } catch (e) {
-            if (!window.QuestBotController.running) { log('Stopped during WATCH_VIDEO loop.'); return; }
+            if (!window.QuestBotController.running) { log(t('stopped_watch_video'), 'warn'); return; }
         }
         const maxAllowed = Math.floor((Date.now() - enrolledAt) / 1000) + maxFuture;
         const diff = maxAllowed - secondsDone;
@@ -551,7 +557,7 @@ async function spoofActivity(quest, secondsDone, secondsNeeded) {
         log(t('progression_seconds', secondsDone, secondsNeeded), 'info');
         await new Promise((r) => setTimeout(r, 20000));
     }
-    log(TRANSLATIONS[CONFIG.language].questCompleted);
+    log(t('questCompleted'), 'success');
 }
 
 // =============================================
