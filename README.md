@@ -1,6 +1,6 @@
-# SpoofDiscordQuest (QuestBypass)
+# SpoofDiscordQuest (QuestBot)
 
-Ce dépôt contient `BypassQuest.js`, un script à injecter dans la console du client Discord (ou dans le renderer d'Electron) pour simuler l'avancement de certaines quêtes.
+Ce dépôt contient `BypassQuest.js`, un script à injecter dans la console du client Discord pour simuler l'avancement des quêtes.
 
 ## Fonctionnalités
 
@@ -51,7 +51,6 @@ Le script enregistre des fonctions de nettoyage (rétablissement des stores, dé
 ## Limitations et avertissements
 - Ce script manipule des internals de Discord (stores webpack internes). Il peut cesser de fonctionner si Discord modifie sa structure interne.
 - Certains types de quêtes (ex: PLAY_ON_DESKTOP, STREAM_ON_DESKTOP) requièrent des fonctionnalités natives. Le script vérifie la présence de `DiscordNative` et affichera un avertissement si indisponible.
-- N'envoyez pas de requêtes vers Discord via des webhooks depuis le renderer: cela peut être rejeté ou bloqué pour cause de CORS/Origine.
 
 ## Débogage
 - Activez `CONFIG.debug = true` pour voir les logs `debug` (snapshots de cfg, valeurs capturées, etc.).
