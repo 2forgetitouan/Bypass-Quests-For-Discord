@@ -1,10 +1,10 @@
 # SpoofDiscordQuest (QuestBot)
 
-[Français](#fr) | [English](#en)
+### [Français](#fr) | [English](#en)
 
 <a id="fr"></a>
 
-## 🇫🇷 Français
+# 🇫🇷 Français
 
 Ce dépôt contient `BypassQuest.js`, un script à injecter dans la console du client Discord pour simuler l'avancement des quêtes.
 
@@ -71,7 +71,7 @@ Le script enregistre des fonctions de nettoyage (rétablissement des stores, dé
 
 <a id="en"></a>
 
-## 🇬🇧 English
+# 🇬🇧 English
 
 This repository contains `BypassQuest.js`, a script you paste into Discord's client console to simulate quest progress.
 
