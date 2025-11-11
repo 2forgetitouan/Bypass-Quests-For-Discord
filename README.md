@@ -1,4 +1,4 @@
-# SpoofDiscordQuest (QuestBot)
+# Spoof Discord Quest (QuestBypass)
 
 ### [Français](#fr) | [English](#en)
 
