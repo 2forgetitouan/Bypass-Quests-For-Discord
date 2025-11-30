@@ -3,7 +3,7 @@
 // =============================================
 const CONFIG = {
     language: "EN", // "FR" ou "EN"
-    debug: true, // Affiche les logs détaillés
+    debug: false, // Affiche les logs détaillés
 };
 
 // =============================================
