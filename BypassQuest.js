@@ -81,6 +81,43 @@ const TRANSLATIONS = {
         stopped_play_activity: `Stopped during PLAY_ACTIVITY loop.`,
         error_handle_heartbeat: (e) => `Error in handleHeartbeat (PLAY_ON_DESKTOP): ${e}`,
         error_handle_heartbeat_stream: (e) => `Error in handleHeartbeatStream (STREAM_ON_DESKTOP): ${e}`,
+        mobile_quest_skipped: (taskName) => `Mobile quest cannot be bypassed, skipping: ${taskName}`,
+    },
+    FR: {
+        questNotFound: "Aucune quête active trouvée !",
+        questCompleted: "Quête terminée !",
+        spoofingVideo: (questName) => `Simulation de vidéo pour : ${questName}`,
+        spoofingGame: (appName, timeLeft) =>
+        `Jeu simulé : ${appName}. Temps restant : ~${timeLeft} min.`,
+        spoofingStream: (appName, timeLeft) =>
+        `Stream simulé : ${appName}. Temps restant : ~${timeLeft} min.`,
+        spoofingActivity: (questName) => `Activité simulée : ${questName}`,
+        controller_confirm_stop_arm: (s) => `Appelez stopQB() à nouveau dans ${s}s pour confirmer l'arrêt de QuestBot.`,
+        controller_stopping_by: (caller) => `Arrêt de QuestBot... appelé par : ${caller}`,
+        controller_stopping_unknown: `Arrêt de QuestBot... (appel inconnu)`,
+        controller_stopped: `QuestBot arrêté et déchargé.`,
+        controller_started: `QuestBot démarré. Relance en cours...`,
+        controller_start_no_main: `main() non disponible pour redémarrer ; veuillez recharger le script.`,
+        controller_stop_check_failed: (e) => `La vérification d'arrêt a échoué : ${e}`,
+        controller_cleanup_error: (e) => `Erreur pendant le nettoyage : ${e}`,
+        controller_start_main_error: (e) => `Erreur lors du lancement de main() : ${e}`,
+        controller_status_error: (e) => `Statut : erreur ${e}`,
+        main_unhandled_rejection: (e) => `Erreur inattendue dans main() : ${e}`,
+        controller_status_prefix: `Statut`,
+        main_quest_info: (taskName, needed, done) => `Type de quête: ${taskName}, Secondes nécessaires: ${needed}, Secondes déjà faites: ${done}`,
+        main_unhandled_type: (taskName) => `Type de quête non géré : ${taskName}`,
+        requires_desktop: `⚠️ Cette quête nécessite l'application desktop.`,
+        debug_outer_seconds: (s) => `(debug) outer secondsNeeded (closure) : ${s}`,
+        debug_cfg_snapshot: (snap) => `(debug) cfg snapshot: ${snap}`,
+        debug_could_not_stringify_cfg: (e) => `(debug) impossible de convertir cfg en string: ${e}`,
+        progression_seconds: (done, needed) => `Progression : ${done}/${needed} secondes`,
+        stopped_watch_video: `Arrêt pendant la boucle WATCH_VIDEO.`,
+        stopped_play_on_desktop: `Arrêt pendant le heartbeat PLAY_ON_DESKTOP.`,
+        stopped_stream_on_desktop: `Arrêt pendant le heartbeat STREAM_ON_DESKTOP.`,
+        stopped_play_activity: `Arrêt pendant la boucle PLAY_ACTIVITY.`,
+        error_handle_heartbeat: (e) => `Erreur dans handleHeartbeat (PLAY_ON_DESKTOP): ${e}`,
+        error_handle_heartbeat_stream: (e) => `Erreur dans handleHeartbeatStream (STREAM_ON_DESKTOP): ${e}`,
+        mobile_quest_skipped: (taskName) => `Quête mobile ne peut pas être bypassée, ignorée : ${taskName}`,
     },
 };
 
@@ -295,13 +332,30 @@ const api = stores.find((x) => x?.exports?.tn?.get).exports.tn;
 async function main() {
     // mark this run with a unique id so older handlers can ignore themselves
     try { window.QuestBotRunId = (window.QuestBotRunId || 0) + 1; window.QuestBotController.runId = window.QuestBotRunId; } catch (e) {}
-    const quest = [...QuestsStore.quests.values()].find(
-        (x) =>
-        x.id !== "1248385850622869556" &&
-        x.userStatus?.enrolledAt &&
-        !x.userStatus?.completedAt &&
-        new Date(x.config.expiresAt).getTime() > Date.now()
-    );
+    
+    // Get all quests and find one that's not mobile and not completed
+    const allQuests = [...QuestsStore.quests.values()];
+    let quest = null;
+    
+    for (const q of allQuests) {
+        const isValid = q.id !== "1248385850622869556" &&
+                       q.userStatus?.enrolledAt &&
+                       !q.userStatus?.completedAt &&
+                       new Date(q.config.expiresAt).getTime() > Date.now();
+        
+        if (!isValid) continue;
+        
+        const taskName = Object.keys(q.config.taskConfig?.tasks || q.config.taskConfigV2?.tasks || {})[0];
+        
+        // Skip mobile quests
+        if (taskName && taskName.includes('MOBILE')) {
+            log(t('mobile_quest_skipped', taskName), 'info');
+            continue;
+        }
+        
+        quest = q;
+        break;
+    }
     
     if (!quest) {
         log(t('questNotFound'), 'warn');
