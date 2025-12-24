@@ -66,10 +66,9 @@ Le script enregistre des fonctions de nettoyage (rétablissement des stores, dé
 ### Contribuer
 - Toute amélioration (clarification des messages, gestion d'autres types de quêtes, tests) est bienvenue.
 
----
-
 **Disclaimer**: Utiliser ce script comporte des risques et peut violer les conditions d'utilisation de Discord. Utilisez-le à vos propres risques et uniquement à des fins d'apprentissage ou de test sur des comptes de test.
 
+---
 
 <a id="en"></a>
 
