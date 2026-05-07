@@ -1,4 +1,4 @@
-// Discord Quest Spoofer
+// Discord Quest Spoofer 2026
 // Simulates quest progress by injecting fake data into Discord's store
 (() => {
 function log(msg, level = 'info') {
