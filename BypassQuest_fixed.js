@@ -1,5 +1,6 @@
 // Discord Quest Spoofer 2026
 // Simulates quest progress by injecting fake data into Discord's store
+// IMPORTANT : Discord has recently begun detecting accounts using this type of program. Use it at your own risk.
 (() => {
 function log(msg, level = 'info') {
     const styles = {
