@@ -4,6 +4,8 @@ A script to simulate Discord quest progress directly from the browser console.
 
 **Status:** Updated and Fixed for 2026
 
+### IMPORTANT : Discord has recently begun detecting accounts using this type of program. Use it at your own risk.
+
 [English](#english) | [Français](#francais)
 
 ---
